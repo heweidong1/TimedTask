@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.timdetask.mapper.SysJobMapper">
+
+<!--    <resultMap type="cmcc.it.project.timedTask.domain.SysJob" id="SysJobResult">-->
+<!--        <id property="jobId" column="job_id"/>-->
+<!--        <result property="jobName" column="job_name"/>-->
+<!--        <result property="jobGroup" column="job_group"/>-->
+<!--        <result property="invokeTarget" column="invoke_target"/>-->
+<!--        <result property="cronExpression" column="cron_expression"/>-->
+<!--        <result property="misfirePolicy" column="misfire_policy"/>-->
+<!--        <result property="concurrent" column="concurrent"/>-->
+<!--        <result property="status" column="status"/>-->
+<!--        <result property="createBy" column="create_by"/>-->
+<!--        <result property="createTime" column="create_time"/>-->
+<!--        <result property="updateBy" column="update_by"/>-->
+<!--        <result property="updateTime" column="update_time"/>-->
+<!--        <result property="remark" column="remark"/>-->
+<!--    </resultMap>-->
+
+    <resultMap type="com.example.timdetask.domain.SysJob" id="SysJobResult">
+        <id property="id" column="id"/>
+        <result property="taskName" column="task_name"/>
+        <result property="jobGroup" column="job_group"/>
+        <result property="taskClassName" column="task_class_name"/>
+        <result property="taskCorn" column="task_corn"/>
+        <result property="taskDescription" column="task_description"/>
+        <result property="taskSystemId" column="task_system_id"/>
+        <result property="taskSystemName" column="task_system_name"/>
+        <result property="taskFlag" column="task_flag"/>
+        <result property="remake1" column="remake1"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="taskGroupId" column="task_group_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="misfirePolicy" column="misfire_policy"/>
+        <result property="concurrent" column="concurrent"/>
+    </resultMap>
+
+    <sql id="selectJobVo">
+        select id,
+               task_name,
+               job_group,
+               task_class_name,
+               task_corn,
+               task_description,
+               misfire_policy,
+               concurrent,
+               task_flag,
+               create_by,
+               create_time,
+               remake1,
+               task_system_id,
+               task_system_name,
+               task_group_id
+        from sys_task
+    </sql>
+
+    <select id="selectJobList" parameterType="com.example.timdetask.domain.SysJob" resultMap="SysJobResult">
+        <include refid="selectJobVo"/>
+        <where>
+            <if test="taskName != null and taskName != ''">
+                AND task_name like concat('%', #{taskName}, '%')
+            </if>
+            <if test="jobGroup != null and jobGroup != ''">
+                AND job_group = #{jobGroup}
+            </if>
+            <if test="taskFlag != null and taskFlag != ''">
+                AND task_flag = #{taskFlag}
+            </if>
+            <if test="taskClassName != null and taskClassName != ''">
+                AND task_class_name like concat('%', #{taskClassName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectJobAll" resultMap="SysJobResult">
+        <include refid="selectJobVo"/>
+        where  task_flag = '0'
+    </select>
+
+    <select id="selectJobById" parameterType="Long" resultMap="SysJobResult">
+        <include refid="selectJobVo"/>
+        where id = #{id}
+    </select>
+
+    <delete id="deleteJobById" parameterType="Long">
+        delete
+        from sys_task
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteJobByIds" parameterType="Long">
+        delete from sys_task where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updateJob" parameterType="com.example.timdetask.domain.SysJob">
+        update sys_task
+        <set>
+            <if test="taskName != null and taskName != ''">task_name = #{taskName},</if>
+            <if test="jobGroup != null and jobGroup != ''">job_group = #{jobGroup},</if>
+            <if test="taskClassName != null and taskClassName != ''">task_class_name = #{taskClassName},</if>
+            <if test="taskCorn != null and taskCorn != ''">task_corn = #{taskCorn},</if>
+            <if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy = #{misfirePolicy},</if>
+            <if test="concurrent != null and concurrent != ''">concurrent = #{concurrent},</if>
+            <if test="taskFlag !=null and taskFlag !=''" >task_flag = #{taskFlag},</if>
+            <if test="remake1 != null and remake1 != ''">remake1 = #{remake1},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="taskSystemId != null ">task_system_id = #{taskSystemId},</if>
+            <if test="taskSystemName != null and taskSystemName != ''">task_system_name = #{taskSystemName},</if>
+            <if test="startTime != null ">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="endTime == null">end_time = null,</if>
+            <if test="taskDescription != null and taskDescription != ''">task_description = #{taskDescription},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <insert id="insertJob" parameterType="com.example.timdetask.domain.SysJob" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_task(
+        <if test="id != null and id != 0">id,</if>
+        <if test="taskName != null and taskName != ''">task_name,</if>
+        <if test="jobGroup != null and jobGroup != ''">job_group,</if>
+        <if test="taskClassName != null and taskClassName != ''">task_class_name,</if>
+        <if test="taskCorn != null and taskCorn != ''">task_corn,</if>
+        <if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy,</if>
+        <if test="concurrent != null and concurrent != ''">concurrent,</if>
+        <if test="taskFlag != null and taskFlag !='' ">task_flag,</if>
+        <if test="remake1 != null and remake1 != ''">remake1,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="updateBy != null and updateBy != ''">update_by,</if>
+        <if test="updateTime != null and updateTime != ''">update_time,</if>
+        <if test="taskSystemId != null">task_system_id,</if>
+        <if test="taskSystemName != null and taskSystemName != ''">task_system_name,</if>
+        <if test="startTime != null">start_time,</if>
+        <if test="endTime != null ">end_time,</if>
+        <if test="taskDescription != null and taskDescription != ''">task_description,</if>
+        <if test="taskGroupId != null and taskGroupId != ''">task_group_id,</if>
+        create_time
+        )values(
+        <if test="id != null and id != 0">#{id},</if>
+        <if test="taskName != null and taskName != ''">#{taskName},</if>
+        <if test="jobGroup != null and jobGroup != ''">#{jobGroup},</if>
+        <if test="taskClassName != null and taskClassName != ''">#{taskClassName},</if>
+        <if test="taskCorn != null and taskCorn != ''">#{taskCorn},</if>
+        <if test="misfirePolicy != null and misfirePolicy != ''">#{misfirePolicy},</if>
+        <if test="concurrent != null and concurrent != ''">#{concurrent},</if>
+        <if test="taskFlag != null and taskFlag !='' ">#{taskFlag},</if>
+        <if test="remake1 != null and remake1 != ''">#{remake1},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+        <if test="updateTime != null ">#{updateTime},</if>
+        <if test="taskSystemId != null">#{taskSystemId},</if>
+        <if test="taskSystemName != null and taskSystemName != ''">#{taskSystemName},</if>
+        <if test="startTime != null ">#{startTime},</if>
+        <if test="endTime != null ">#{endTime},</if>
+        <if test="taskDescription != null and taskDescription != ''">#{taskDescription},</if>
+        <if test="taskGroupId != null and taskGroupId != ''">#{taskGroupId},</if>
+        sysdate()
+        )
+    </insert>
+    <!--根据定时任务组获取定时任务-->
+    <select id="queryByTaskGroupId" resultMap="SysJobResult">
+        select
+        id, task_name, task_corn, task_class_name, task_flag, task_description, task_system_id,task_system_name,
+        create_by,
+        create_time, update_by, update_time, delete_flag,
+        remake1,start_time,end_time,task_group_id
+        from sys_task
+        <where>
+            task_group_id = #{taskGroupId}
+        </where>
+    </select>
+
+    <!--定时发起定时任务列表-->
+    <select id="queryTaskList" resultMap="SysJobResult">
+        SELECT id,
+               task_name,
+               task_corn,
+               task_class_name,
+               task_flag,
+               task_description,
+               task_system_id,
+               task_system_name,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               delete_flag,
+               remake1,
+               start_time,
+               end_time,
+               task_group_id
+        FROM (SELECT t.*
+              FROM (
+                       SELECT task_group_id,
+                              max(id) AS id
+                       FROM sys_task
+                       WHERE task_group_id is not null
+                       GROUP BY task_group_id
+                   ) a
+                       LEFT JOIN sys_task t ON t.task_group_id = a.task_group_id
+                  AND t.id = a.id) as s
+        WHERE s.create_by = #{creatBy}
+    </select>
+</mapper> 

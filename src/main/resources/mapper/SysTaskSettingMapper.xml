@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.timdetask.mapper.SysTaskSettingMapper">
+
+    <resultMap type="com.example.timdetask.domain.SysTaskSetting" id="SysTaskSettingMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="taskId" column="task_id" jdbcType="INTEGER"/>
+        <result property="busiSettingId" column="busi_setting_id" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="SysTaskSettingMap">
+        select id,
+               task_id,
+               busi_setting_id,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from alpha.sys_task_setting
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="SysTaskSettingMap">
+        select id,
+               task_id,
+               busi_setting_id,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from alpha.sys_task_setting limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="SysTaskSettingMap">
+        select
+        id, task_id, busi_setting_id, create_by, create_time, update_by, update_time
+        from alpha.sys_task_setting
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="taskId != null">
+                and task_id = #{taskId}
+            </if>
+            <if test="busiSettingId != null">
+                and busi_setting_id = #{busiSettingId}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                and update_by = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.example.timdetask.domain.SysTaskSetting">
+        insert into alpha.sys_task_setting(task_id, busi_setting_id, create_by, create_time, update_by, update_time)
+        values (#{taskId}, #{busiSettingId}, #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into alpha.sys_task_setting(task_id, busi_setting_id, create_by, create_time, update_by, update_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.taskId}, #{entity.busiSettingId}, #{entity.createBy}, #{entity.createTime}, #{entity.updateBy},
+            #{entity.updateTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into alpha.sys_task_setting(task_id, busi_setting_id, create_by, create_time, update_by, update_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.taskId}, #{entity.busiSettingId}, #{entity.createBy}, #{entity.createTime}, #{entity.updateBy},
+            #{entity.updateTime})
+        </foreach>
+        on duplicate key update
+        task_id = values(task_id) , busi_setting_id = values(busi_setting_id) , create_by = values(create_by) ,
+        create_time = values(create_time) , update_by = values(update_by) , update_time = values(update_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update alpha.sys_task_setting
+        <set>
+            <if test="taskId != null">
+                task_id = #{taskId},
+            </if>
+            <if test="busiSettingId != null">
+                busi_setting_id = #{busiSettingId},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                create_by = #{createBy},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from alpha.sys_task_setting
+        where id = #{id}
+    </delete>
+
+    <!--根据busiSettingID查询关联关系-->
+    <select id="selectByBusiSettingId" parameterType="java.lang.Long" resultMap="SysTaskSettingMap">
+        select
+            id, task_id, busi_setting_id, create_by, create_time, update_by, update_time
+        from alpha.sys_task_setting where   busi_setting_id = #{busiId}
+    </select>
+
+</mapper>
+
